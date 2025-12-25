@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EditFlow Pro</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --side-bg: #0f172a;
+            --main-bg: #f8fafc;
+            --accent-blue: #3b82f6;
+            --accent-orange: #fb923c;
+            --white: #ffffff;
+        }
+
+        * { margin: 0;
+             padding: 0;
+              box-sizing: border-box;
+               font-family: 'Segoe UI', sans-serif;
+             }
+
+        body { background-color: var(--main-bg);
+             display: flex; 
+             min-height: 100vh;
+             }
+
+        /* LOGIN SCREEN */
+        .auth-screen {
+            height: 100vh;
+             width: 100vw;
+              display: flex;
+               justify-content: center
+               ; align-items: center;
+            background: #cbd5e1;
+             position: fixed
+             ; z-index: 9999;
+        }
+
+        .login-box {
+            background: var(--white);
+             padding: 40px;
+              border-radius: 20px; 
+              width: 100%; 
+              max-width: 400px;
+            text-align: center;
+             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .auth-input {
+            width: 100%;
+             padding: 15px;
+              margin: 15px 0;
+               border: 2px solid #e2e8f0;
+            border-radius: 12px; 
+             font-size: 1rem;
+              outline: none;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 260px;
+             height: 100vh;
+              background-color: var(--side-bg);
+               color: var(--white);
+            position: fixed;
+             padding: 30px 20px;
+              display: flex; 
+              flex-direction: column;
+        }
+
+        .sidebar-logo { font-size: 1.4rem; 
+            font-weight: 800;
+             margin-bottom: 40px;
+             display: flex;
+             gap: 10px;
+             }
+
+        .nav-item {
+            display: flex;
+             align-items: center;
+              gap: 12px;
+               color: #94a3b8; 
+               text-decoration: none;
+            padding: 12px 15px;
+             border-radius: 10px;
+              margin-bottom: 8px;
+               font-weight: 600;
+               cursor: pointer;
+        }
+
+        .nav-item.active { background-color: #1e293b;
+             color: white; 
+             border-left: 4px solid var(--accent-blue);
+             }
+
+        /* CONTENT */
+        .content { margin-left: 260px;
+             padding: 40px; 
+             width: calc(100% - 260px);
+             }
+
+        .header-flex { display: flex;
+             justify-content: space-between;
+              align-items: center;
+               margin-bottom: 30px;
+             }
+        
+        .stats-grid { display: grid;
+             grid-template-columns: repeat(4, 1fr);
+              gap: 20px;
+               margin-bottom: 30px; 
+            }
+
+        .stat-card { background: var(--white);
+             padding: 25px;
+              border-radius: 15px; 
+               box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+                border-bottom: 4px solid #ddd;
+             }
+
+        .stat-card h2 { font-size: 1.8rem;
+             margin-top: 5px;
+             }
+
+        /* BUTTONS */
+        .btn-primary { background: var(--accent-blue);
+             color: white;
+              border: none;
+               padding: 12px 24px;
+                border-radius: 10px; 
+                font-weight: 700;
+                 cursor: pointer; 
+                }
+
+        .btn-done { background: #10b981;
+             color: white;
+              border: none; 
+              padding: 6px 14px;
+               border-radius: 8px;
+                cursor: pointer;
+                 font-size: 12px;
+                  font-weight: bold;
+                   transition: 0.2s; 
+                }
+
+        .btn-done:hover { background: #059669; 
+        }
+
+        .btn-delete { color: #ef4444;
+             border: none; 
+             background: none;
+              cursor: pointer; 
+              font-size: 1.2rem;
+               transition: 0.2s;
+             }
+
+        .btn-delete:hover { transform: scale(1.2);
+         }
+
+        .btn-logout { background: #ef4444;
+             color: white; 
+             border: none;
+              padding: 12px; 
+              border-radius: 10px; 
+              width: 100%; 
+              margin-top: auto;
+               cursor: pointer;
+                font-weight: 700; 
+            }
+
+        /* TABLE */
+        .table-card { background: white;
+             border-radius: 15px;
+              padding: 25px;
+               box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            }
+
+        table { width: 100%; 
+            border-collapse: collapse; 
+        }
+
+        th, td { padding: 15px;
+             text-align: left;
+              border-bottom: 1px solid #f1f5f9; 
+            }
+        
+        /* MODAL */
+        .modal-bg {
+            display: none;
+             position: fixed;
+              inset: 0;
+               background: rgba(0,0,0,0.6);
+            z-index: 1000;
+             justify-content: center;
+              align-items: center;
+               backdrop-filter: blur(5px);
+        }
+
+        .modal-box { background: white;
+             padding: 35px;
+              border-radius: 20px;
+               width: 400px; 
+            }
+            
+        .badge { background: #1e293b;
+             color: var(--accent-orange);
+              padding: 5px 10px;
+               border-radius: 5px;
+                font-size: 11px;
+                 margin-bottom: 10px;
+                  display: inline-block;
+                   font-weight: bold;
+                 }
+        /* --- ROOT VARIABLES --- */
+:root {
+    --side-bg: #0f172a;
+    --main-bg: #f8fafc;
+    --accent-blue: #3b82f6;
+    --accent-orange: #fb923c;
+    --white: #ffffff;
+}
+
+
+/* --- GENERAL STYLES --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+
+body {
+    background-color: var(--main-bg);
+    display: flex;
+    min-height: 100vh;
+}
+
+
+/* --- AUTH / LOGIN SCREEN --- */
+.auth-screen {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #cbd5e1;
+    position: fixed;
+    z-index: 9999;
+}
+
+
+.login-box {
+    background: var(--white);
+    padding: 40px;
+    border-radius: 20px;
+    width: 400px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+
+/* --- SIDEBAR NAVIGATION --- */
+.sidebar {
+    width: 260px;
+    height: 100vh;
+    background-color: var(--side-bg);
+    color: white;
+    position: fixed;
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+
+.nav-item {
+    padding: 12px 15px;
+    color: #94a3b8;
+    cursor: pointer;
+    display: flex;
+    gap: 10px;
+    border-radius: 10px;
+    margin-bottom: 5px;
+    transition: 0.3s;
+}
+
+
+.nav-item.active {
+    background: #1e293b;
+    color: white;
+    border-left: 4px solid var(--accent-blue);
+}
+
+
+/* --- ACTION BUTTONS (As per your Image) --- */
+.btn-delete {
+    color: #ef4444;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: 0.2s;
+}
+
+
+.btn-delete:hover {
+    transform: scale(1.2);
+}
+
+
+.btn-logout {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 10px;
+    width: 100%;
+    margin-top: auto;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+
+/* --- TABLE CARD SECTION --- */
+.table-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+
+th, td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+
+/* --- MODAL / POPUP --- */
+.modal-bg {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(5px);
+}
+
+/* --- DOWNLOAD BUTTONS STYLE --- */
+
+.report-controls {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.btn-download {
+    background-color: #1e293b;
+    color: #fb923c;
+    border: 2px solid #fb923c;
+    padding: 15px 25px;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+
+.btn-download:hover {
+    background-color: #fb923c;
+    color: #fff;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(251, 146, 60, 0.2);
+}
+
+/* --- DOWNLOAD CARDS (As per Image) --- */
+
+.download-container {
+    display: flex;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.dl-card {
+    border: none;
+    border-radius: 15px;
+    width: 180px;
+    height: 350px; /* Bada aur lamba jaisa image me tha */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: 0.3s;
+    padding: 20px;
+    color: white;
+    font-weight: 700;
+    text-align: center;
+}
+
+.monthly { background-color: #0f172a; } /* Dark Blue */
+.yearly { background-color: #fb923c; }  /* Orange */
+
+.dl-card i {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+.dl-card:hover {
+    transform: translateY(-10px);
+    filter: brightness(1.2);
+}
+
+/* --- BUTTON DELETE (As per Code Image) --- */
+
+.btn-delete {
+    color: #ef4444;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: 0.2s;
+}
+
+.btn-delete:hover {
+    transform: scale(1.2);
+}
+
+/* --- TABLE CARD --- */
+
+.table-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+/* --- Header Layout --- */
+.report-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px 0;
+}
+
+/* --- Normal Small Buttons --- */
+.btn-sm {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    color: white;
+    transition: 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Colors as per your theme */
+.month { background-color: #0f172a; } /* Dark Blue */
+.year { background-color: #fb923c; }  /* Orange */
+
+.btn-sm:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.btn-sm i {
+    font-size: 16px;
+}
+    </style>
+</head>
+    <body>
+    <div id="login-screen" class="auth-screen">
+        <div class="login-box">
+            <div class="auth-header">
+                <div class="logo-icon-box"><i class="fas fa-user-shield"></i></div>
+                <h2>EDITFLOW <span class="orange">PRO</span></h2>
+            </div>
+            <input type="password" id="user-pass" placeholder="Password " class="auth-input">
+            <button class="btn-primary" style="width:100%" onclick="handleAuth()">Login</button>
+        </div>
+    </div>
+
+    <div id="main-ui" style="display: none; width: 100%;">
+        <aside class="sidebar">
+            <div class="sidebar-logo"><i class="fas fa-play" style="color:var(--accent-blue)"></i> EDITFLOW</div>
+            <nav class="nav-menu">
+                <div id="btn-dash" class="nav-item active" onclick="showSection('dashboard')"><i class="fas fa-th-large"></i> Dashboard</div>
+                <div id="btn-reports" class="nav-item" onclick="showSection('reports')"><i class="fas fa-history"></i> History & Reports</div>
+            </nav>
+            <div style="margin-top:auto">
+                <div id="role-tag" class="badge">GUEST</div>
+                <button class="btn-logout" onclick="logout()">LOGOUT</button>
+            </div>
+        </aside>
+
+        <main class="content">
+            <div id="section-dashboard">
+                <div class="header-flex">
+                    <h1>Dashboard</h1>
+                    <button class="btn-primary admin-only" onclick="openPopup()">+ New Project</button>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card blue"><p>TOTAL</p><h2 id="s-total">0</h2></div>
+                    <div class="stat-card green"><p>EARNINGS</p><h2 id="s-earn">₹0</h2></div>
+                    <div class="stat-card orange"><p>PENDING</p><h2 id="s-pending">0</h2></div>
+                    <div class="stat-card purple"><p>DONE</p><h2 id="s-done">0</h2></div>
+                </div>
+                <div class="table-card">
+                    <h3>Current Projects</h3>
+                    <table>
+                        <thead>
+                            <tr><th>Client</th><th>Budget</th><th>Status</th><th class="admin-only">Action</th></tr>
+                        </thead>
+                        <tbody id="p-list"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="section-reports" style="display:none;">
+                <div class="header-flex">
+                    <h1>Project History</h1>
+                    <input type="text" id="hist-search" placeholder="Search history..." onkeyup="filterHistory()" class="auth-input" style="width:300px; margin:0;">
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card blue"><p>THIS MONTH</p><h2 id="r-month">₹0</h2></div>
+                    <div class="stat-card purple"><p>THIS YEAR</p><h2 id="r-year">₹0</h2></div>
+                </div>
+                <div class="table-card">
+                    <table id="history-table">
+                        <thead>
+                            <tr><th>Date</th><th>Client Name</th><th>Budget</th><th>Status</th></tr>
+                        </thead>
+                        <tbody id="h-list"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-bg" id="modal">
+        <div class="modal-box">
+            <h3>Add New Entry</h3>
+            <form id="p-form">
+                <input type="text" id="cName" placeholder="Client Name" class="auth-input" required>
+                <input type="number" id="pPrice" placeholder="Price (₹)" class="auth-input" required>
+                <input type="date" id="pDate" class="auth-input" required>
+                <select id="pStatus" class="auth-input">
+                    <option value="Pending">Pending</option>
+                    <option value="Completed">Completed</option>
+                </select>
+                <button type="submit" class="btn-primary" style="width:100%">Save</button>
+                <button type="button" onclick="closePopup()" style="width:100%; border:none; background:none; margin-top:10px; cursor:pointer;">Cancel</button>
+            </form>
+        </div>
+    </div>
+        <div class="report-header">
+    <h2>History Log</h2>
+    <div class="download-btns">
+        <button class="btn-sm month" onclick="dl('Month')">
+            <i class="fas fa-file-download"></i> Monthly Report
+        </button>
+        <button class="btn-sm year" onclick="dl('Year')">
+            <i class="fas fa-file-excel"></i> Yearly Report
+        </button>
+    </div>
+</div>
+    <script>
+        let project = JSON.parse(localStorage.getItem('editflow_db_final')) || [];
+        let rol = localStorage.getItem('ef_user_role') || null;
+
+        function handleAuth() {
+            const pass = document.getElementById('user-pass').value;
+            if(pass === '3212') { localStorage.setItem('ef_user_role', 'admin'); location.reload(); }
+            else if(pass === '1232') { localStorage.setItem('ef_user_role', 'user'); location.reload(); }
+            else { alert("Wrong Pass!"); }
+        }
+
+        window.onload = function() {
+            if(role) {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('main-ui').style.display = 'flex';
+                if(role === 'user') {
+                    document.querySelectorAll('.admin-only').forEach(e => e.style.display = 'none');
+                    document.getElementById('role-tag').innerText = "VIEWER";
+                } else {
+                    document.getElementById('role-tag').innerText = "ADMIN";
+                }
+                updateUI();
+            }
+        }
+
+        function updateUI() {
+            const list = document.getElementById('p-list');
+            list.innerHTML = '';
+            let earn = 0, pend = 0, done = 0;
+
+            projects.forEach((p, i) => {
+                const isDone = p.status === 'Completed';
+                list.innerHTML += `
+                    <tr>
+                        <td><b>${p.name}</b></td>
+                        <td>₹${Number(p.price).toLocaleString()}</td>
+                        <td style="color:${isDone?'#10b981':'#fb923c'}; font-weight:bold;">${p.status}</td>
+                        <td class="admin-only">
+                            <div style="display:flex; gap:15px; align-items:center;">
+                                ${!isDone ? `<button class="btn-done" onclick="markDone(${i})">Done</button>` : '<i class="fas fa-check-circle" style="color:#10b981"></i>'}
+                                <button class="btn-delete" onclick="del(${i})"><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </td>
+                    </tr>`;
+                if(isDone) { earn += Number(p.price); done++; } else { pend++; }
+            });
+
+            document.getElementById('s-total').innerText = projects.length;
+            document.getElementById('s-earn').innerText = '₹' + earn.toLocaleString();
+            document.getElementById('s-pending').innerText = pend;
+            document.getElementById('s-done').innerText = done;
+            localStorage.setItem('editflow_db_final', JSON.stringify(projects));
+        }
+
+        function markDone(i) {
+            projects[i].status = 'Completed';
+            updateUI();
+        }
+
+        function del(i) {
+            if(confirm("Confirm: Kya is project ko delete kar du?")) {
+                projects.splice(i, 1);
+                updateUI();
+            }
+        }
+
+        function logout() { localStorage.removeItem('ef_user_role'); location.reload(); }
+        function openPopup() { document.getElementById('modal').style.display = 'flex'; }
+        function closePopup() { document.getElementById('modal').style.display = 'none'; }
+
+        document.getElementById('p-form').onsubmit = (e) => {
+            e.preventDefault();
+            projects.push({
+                name: document.getElementById('cName').value,
+                price: document.getElementById('pPrice').value,
+                status: document.getElementById('pStatus').value
+            });
+            updateUI(); closePopup(); e.target.reset();
+        }
+
+        let projects = JSON.parse(localStorage.getItem('editflow_final_db')) || [];
+let role = localStorage.getItem('ef_role') || null;
+
+function handleAuth() {
+    const pass = document.getElementById('user-pass').value;
+    if(pass === '3212') { localStorage.setItem('ef_role', 'admin'); location.reload(); }
+    else if(pass === '1232') { localStorage.setItem('ef_role', 'user'); location.reload(); }
+    else { alert("Galat Password!"); }
+}
+
+window.onload = function() {
+    if(role) {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('main-ui').style.display = 'flex';
+        if(role === 'user') {
+            document.querySelectorAll('.admin-only').forEach(e => e.style.display = 'none');
+            document.getElementById('role-tag').innerText = "VIEWER MODE";
+        } else {
+            document.getElementById('role-tag').innerText = "ADMIN MODE";
+        }
+        updateUI();
+    }
+}
+
+function showSection(id) {
+    document.getElementById('section-dashboard').style.display = id === 'dashboard' ? 'block' : 'none';
+    document.getElementById('section-reports').style.display = id === 'reports' ? 'block' : 'none';
+    document.getElementById('btn-dash').classList.toggle('active', id === 'dashboard');
+    document.getElementById('btn-reports').classList.toggle('active', id === 'reports');
+    if(id === 'reports') updateHistory();
+}
+
+function updateUI() {
+    const list = document.getElementById('p-list');
+    list.innerHTML = '';
+    let earn = 0, pend = 0, done = 0;
+
+    projects.forEach((p, i) => {
+        const isDone = p.status === 'Completed';
+        list.innerHTML += `
+            <tr>
+                <td><b>${p.name}</b></td>
+                <td>₹${Number(p.price).toLocaleString()}</td>
+                <td style="color:${isDone?'#10b981':'#fb923c'}; font-weight:bold;">${p.status}</td>
+                <td class="admin-only">
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        ${!isDone ? `<button class="btn-done" onclick="markDone(${i})">Done</button>` : '<i class="fas fa-check-circle" style="color:#10b981"></i>'}
+                        <i class="fas fa-trash" onclick="del(${i})" style="color:red; cursor:pointer;"></i>
+                    </div>
+                </td>
+            </tr>`;
+        if(isDone) { earn += Number(p.price); done++; } else { pend++; }
+    });
+
+    document.getElementById('s-total').innerText = projects.length;
+    document.getElementById('s-earn').innerText = '₹' + earn.toLocaleString();
+    document.getElementById('s-pending').innerText = pend;
+    document.getElementById('s-done').innerText = done;
+    localStorage.setItem('editflow_final_db', JSON.stringify(projects));
+}
+
+function updateHistory() {
+    const hList = document.getElementById('h-list');
+    hList.innerHTML = '';
+    const now = new Date();
+    let mEarn = 0, yEarn = 0;
+
+    projects.forEach(p => {
+        const d = new Date(p.date);
+        hList.innerHTML += `
+            <tr>
+                <td>${p.date}</td>
+                <td>${p.name}</td>
+                <td>₹${Number(p.price).toLocaleString()}</td>
+                <td><span style="color:${p.status==='Completed'?'green':'orange'}">${p.status}</span></td>
+            </tr>`;
+        
+        if(p.status === 'Completed' && d.getFullYear() === now.getFullYear()) {
+            yEarn += Number(p.price);
+            if(d.getMonth() === now.getMonth()) mEarn += Number(p.price);
+        }
+    });
+
+    document.getElementById('r-month').innerText = '₹' + mEarn.toLocaleString();
+    document.getElementById('r-year').innerText = '₹' + yEarn.toLocaleString();
+}
+
+function filterHistory() {
+    let input = document.getElementById("hist-search").value.toLowerCase();
+    let rows = document.getElementById("h-list").getElementsByTagName("tr");
+    for (let row of rows) {
+        row.style.display = row.innerText.toLowerCase().includes(input) ? "" : "none";
+    }
+}
+
+function markDone(i) { projects[i].status = 'Completed'; updateUI(); if(document.getElementById('section-reports').style.display === 'block') updateHistory(); }
+function del(i) { if(confirm("Delete kar du?")) { projects.splice(i,1); updateUI(); if(document.getElementById('section-reports').style.display === 'block') updateHistory(); } }
+function logout() { localStorage.removeItem('ef_role'); location.reload(); }
+function openPopup() { document.getElementById('modal').style.display = 'flex'; }
+function closePopup() { document.getElementById('modal').style.display = 'none'; }
+
+document.getElementById('p-form').onsubmit = (e) => {
+    e.preventDefault();
+    projects.push({
+        name: document.getElementById('cName').value,
+        price: document.getElementById('pPrice').value,
+        date: document.getElementById('pDate').value,
+        status: document.getElementById('pStatus').value
+    });
+    updateUI(); closePopup(); e.target.reset();
+}
+
+// --- DOWNLOAD CSV LOGIC ---
+
+function downloadCSV(type) {
+    if (projects.length === 0) {
+        return alert("Bhai, download karne ke liye koi data nahi hai!");
+    }
+
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    // 1. Filter Data based on Type
+    const filteredData = projects.filter(p => {
+        const projectDate = new Date(p.date); // Maan kar chal rahe hain p.date format 'YYYY-MM-DD' hai
+        
+        if (type === 'Monthly') {
+            return projectDate.getMonth() === currentMonth && projectDate.getFullYear() === currentYear;
+        } else if (type === 'Yearly') {
+            return projectDate.getFullYear() === currentYear;
+        }
+        return true;
+    });
+
+    if (filteredData.length === 0) {
+        return alert(`Is ${type === 'Monthly' ? 'Mahine' : 'Saal'} ka koi record nahi mila!`);
+    }
+
+    // 2. Create CSV Content
+    let csvContent = "Date,Client Name,Budget,Status\n";
+    
+    filteredData.forEach(p => {
+        // Data rows banana
+        const row = `${p.date},${p.name},${p.price},${p.status}`;
+        csvContent += row + "\n";
+    });
+
+    // 3. Trigger Download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    
+    link.setAttribute("href", url);
+    link.setAttribute("download", `EditFlow_${type}_Report_${now.toLocaleDateString()}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// --- DOWNLOAD LOGIC ---
+
+function downloadCSV(type) {
+    const now = new Date();
+    // Filter logic: Check if data matches current month/year
+    const data = projects.filter(p => {
+        const d = new Date(p.date);
+        return type === 'Monthly' ? 
+            (d.getMonth() === now.getMonth()) : 
+            (d.getFullYear() === now.getFullYear());
+    });
+
+    if (data.length === 0) return alert("Bhai, is range me koi data nahi mila!");
+
+    let csv = "Date,Client,Price,Status\n";
+    data.forEach(p => csv += `${p.date},${p.name},${p.price},${p.status}\n`);
+
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `EditFlow_${type}_${now.toLocaleDateString()}.csv`;
+    a.click();
+}
+
+// --- DELETE LOGIC ---
+
+function del(index) {
+    if(confirm("Confirm Delete?")) {
+        projects.splice(index, 1);
+        updateUI(); // Pura table refresh
+    }
+}
+
+function dl(type) {
+    let now = new Date();
+    // Filter & CSV logic in one place
+    let csv = "Date,Client,Price,Status\n";
+    let filtered = projects.filter(p => {
+        let d = new Date(p.date);
+        return type === 'Month' ? (d.getMonth() === now.getMonth()) : (d.getFullYear() === now.getFullYear());
+    });
+
+    if (filtered.length === 0) return alert("No Data!");
+
+    filtered.forEach(p => csv += `${p.date},${p.name},${p.price},${p.status}\n`);
+    
+    let a = document.createElement("a");
+    a.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
+    a.download = `Report_${type}.csv`;
+    a.click();
+}
+
+function del(i) {
+    if(confirm("Delete?")) { projects.splice(i, 1); updateUI(); }
+}
+
+function dl(type) {
+    let now = new Date();
+    let csv = "Date,Client,Price,Status\n";
+    
+    // Filter logic
+    let data = projects.filter(p => {
+        let d = new Date(p.date);
+        return type === 'Month' ? (d.getMonth() === now.getMonth()) : (d.getFullYear() === now.getFullYear());
+    });
+
+    if (data.length === 0) return alert("Bhai, data nahi mila!");
+
+    data.forEach(p => csv += `${p.date},${p.name},${p.price},${p.status}\n`);
+    
+    let a = document.createElement("a");
+    a.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
+    a.download = `EditFlow_${type}_Report.csv`;
+    a.click();
+}
+    </script>
+</body>
+</html>
